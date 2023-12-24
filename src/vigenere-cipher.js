@@ -20,15 +20,66 @@ const { NotImplementedError } = require('../extensions/index.js');
  * 
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+  constructor(reverse = true) {
+    this.reverse = reverse;
   }
-  decrypt() {
-    throw new NotImplementedError('Not implemented');
-    // remove line with error and write your code here
+
+  encrypt(message, key) {
+    if (!message || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+
+    message = message.toUpperCase();
+    key = key.toUpperCase();
+
+    let encryptedMessage = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < message.length; i++) {
+      const char = message[i];
+
+      if (/[^A-Z]/.test(char)) {
+        encryptedMessage += char;
+      } else {
+        const shift = key.charCodeAt(keyIndex) - 65;
+        const encryptedChar = String.fromCharCode((char.charCodeAt() + shift - 65 + 26) % 26 + 65);
+        encryptedMessage += encryptedChar;
+
+        keyIndex = (keyIndex + 1) % key.length;
+      }
+    }
+
+    return this.reverse ? encryptedMessage : encryptedMessage.split('').reverse().join('');
+  }
+
+  decrypt(encryptedMessage, key) {
+    if (!encryptedMessage || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+
+    key = key.toUpperCase();
+
+    let decryptedMessage = '';
+    let keyIndex = 0;
+
+    for (let i = 0; i < encryptedMessage.length; i++) {
+      const char = encryptedMessage[i];
+
+      if (/[^A-Z]/.test(char)) {
+        decryptedMessage += char;
+      } else {
+        const shift = key.charCodeAt(keyIndex) - 65;
+        const decryptedChar = String.fromCharCode((char.charCodeAt() - shift - 65 + 26) % 26 + 65);
+        decryptedMessage += decryptedChar;
+
+        keyIndex = (keyIndex + 1) % key.length;
+      }
+    }
+
+    return this.reverse ? decryptedMessage : decryptedMessage.split('').reverse().join('');
   }
 }
+
 
 module.exports = {
   VigenereCipheringMachine
